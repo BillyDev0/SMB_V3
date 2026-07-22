@@ -6,4 +6,5 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s"
 )
 
-logger=logging.getLogger(__name__)
+logging.getLogger("watchfiles").setLevel(logging.WARNING)
+logging.getLogger("uvicorn").setLevel(logging.WARNING)

@@ -65,7 +65,7 @@ Aturan:
     payload={
         "model":"qwen2.5:7b",
         "prompt":prompt,
-        "stream":False,
+        "stream":True,
         "options":{
             "temperature":0.3,
             "num_predict":150,
