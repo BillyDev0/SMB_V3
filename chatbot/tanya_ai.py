@@ -9,41 +9,16 @@ from fitur_manage.batas_stok import cek_stok_menipis
 import logging
 from logger_config import *
 from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+import asyncio
+import json
 app=FastAPI()
 logger = logging.getLogger(__name__)
 
 AI_server="http://localhost:11434/api/chat"
 
 
-def jawab_chat(message):
-    AI_generate='http://localhost:11434/api/generate'
-
-    prompt=f"""Kamu adalah asisten toko yang ramah dan helpful. 
-    Jawab pertanyaan atau sapaan user berikut dengan singkat dan natural dalam bahasa Indonesia.
-    
-    prompt user:
-    {message}
-    """
-    payload={
-        "model":"qwen2.5:7b",
-        "prompt":prompt,
-        "stream":False,
-        "options":{
-            "temperature":0.3,
-            "num_predict":150,
-            "top_p":0.5
-        }
-    }
-
-    try:
-        res=requests.post(AI_generate,json=payload)
-        jawaban=res.json()['response']
-        return jawaban
-
-    except requests.exceptions.ConnectionError:
-        return{f"status":"error","pesan":f"server ollama belum dijalankan"}
-
-def generate(message):
+async def generate(message):
     AI_generate='http://localhost:11434/api/generate'
 
     prompt=f"""Kamu adalah asisten sistem manajemen barang.
@@ -58,6 +33,7 @@ Aturan:
 - Jika status adalah "error", jelaskan pesan error kepada pengguna dengan bahasa yang mudah dipahami.
 - Jika status adalah "success", sampaikan hasilnya secara natural.
 - jangan bertele - tele
+- jika prompt berisi pengetahuan umum maka tidak perlu di sederhanakan
     
     prompt user:
     {message}
@@ -68,19 +44,31 @@ Aturan:
         "stream":True,
         "options":{
             "temperature":0.3,
-            "num_predict":150,
             "top_p":0.5
         }
     }
 
     try:
-        res=requests.post(AI_generate,json=payload)
-        jawaban=res.json()['response']
-        return jawaban
+        res=requests.post(AI_generate,json=payload,stream=True)
+        res.raise_for_status()
+
+        for line in res.iter_lines():
+            if line:
+                line=json.loads(line)
+                token=line['response']
+                yield token
 
     except requests.exceptions.ConnectionError:
-        return{f"status":"error","pesan":f"server ollama belum dijalankan"}
+        yield "server ollama belum dijalankan"
+
     
+async def streame_collect(username:str,message:str):
+    tokens=[]
+    async for chunk in generate(message):
+        tokens.append(chunk)
+        yield chunk
+
+    save_history(username,"AI","".join(tokens))
 
 tools={
         "tambah_barang":tambah_barang,
@@ -90,10 +78,9 @@ tools={
         "tambah_stok":tambah_stok,
         "diskon_barang":diskon,
         "cek_stok_menipis":cek_stok_menipis,
-        "chat":jawab_chat
 }
 @app.get('/d')
-def tanya_ai(username,prompt):
+async def tanya_ai(username,prompt):
     logger.info(f"username {username} mengirim prompt {prompt}")
 
     history=get_history(username)
@@ -292,25 +279,6 @@ def tanya_ai(username,prompt):
             }
         },
 
-        {
-            "type":"function",
-            "function":{
-                "name":"chat",
-                "description":"fitur ini untuk obrolan random dengan user",
-                "parameters":{
-                    "type":"object",
-                    "properties":{
-                        "message":{
-                            "type":"string",
-                            "description":"isi obrolan"
-                        }
-                    },
-                    "required":[
-                        "message"
-                    ]
-                }
-            }
-        }
     ],
         "options":{
             "temperature":0,
@@ -322,14 +290,15 @@ def tanya_ai(username,prompt):
     try:
         save_history(username,"User",prompt)
         res=requests.post(AI_server,json=payload)
-    
-        if res.status_code!=200:
-            return res.text
+        res.raise_for_status()
+
         logger.info(f"{res.json()}")
         output_AI=res.json()['message']
         tool_calls=output_AI.get('tool_calls')
+        logger.info(tool_calls)
+
+        all_action=[]
         if tool_calls:
-            all_action=[]
             for data in tool_calls:
                 nama=data['function']['name']
                 args=data['function']['arguments']
@@ -339,26 +308,27 @@ def tanya_ai(username,prompt):
                 tools_dipakai=tools[nama]
                 jawaban=tools_dipakai(**args)
                 all_action.append(jawaban)
-
-            output=generate(all_action)
-            save_history(username,"AI",output)
-            logger.info({f"output AI to user: tools:{nama}, output:{output}"})
-            return output
     
         else:
             content=output_AI['content']
 
-            if content:
-                logger.info({f"output content to user: {content}"})
-                return content
-              
+            if not content:
+                all_action.append({
+                        "status": "error",
+                        "pesan": "Permintaan tidak dapat diproses. Pastikan data yang dimasukkan lengkap dan sesuai format."
+                    })
 
-            else:
-                return {
-                    "status": "error",
-                    "pesan": "Permintaan tidak dapat diproses. Pastikan data yang dimasukkan lengkap dan sesuai format."
-                }
+            jawaban=content
+            all_action.append(jawaban)
 
+        async for chunk in streame_collect(username,"\n".join(map(str,all_action))):
+            print(chunk,end="",flush=True)
+            await asyncio.sleep(0.05)
+        
     except Exception as e:
         logger.exception(f"Error tidak terduga: {str(e)}")
-        return {"status": "error", "pesan": "terjadi kesalahan pada sistem"}
+        print("terjadi kesalahan pada sistem")
+
+
+prompt=input("prompt: ")
+asyncio.run(tanya_ai("b",prompt))

@@ -6,7 +6,6 @@ from fitur_manage.batas_stok import cek_stok_menipis
 import logging
 from logger_config import *
 
-
 logger = logging.getLogger(__name__)
 
 def login(username,password):
