@@ -34,7 +34,6 @@ async def collect_stream(prompt: str):
 
 def main():
     prompt=input("Prompt Streaming: ")
-
     asyncio.run(collect_stream(prompt))
 
 main()

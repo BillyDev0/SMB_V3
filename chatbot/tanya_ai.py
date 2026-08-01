@@ -12,6 +12,7 @@ from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 import asyncio
 import json
+from RAG_AI import similarity_search
 app=FastAPI()
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,8 @@ Aturan:
 - Jika status adalah "success", sampaikan hasilnya secara natural.
 - jangan bertele - tele
 - jika prompt berisi pengetahuan umum maka tidak perlu di sederhanakan
+- Jika informasi tidak tersedia di context, katakan "informasi tersebut tidak tersedia."
+
     
     prompt user:
     {message}
@@ -61,7 +64,7 @@ Aturan:
     except requests.exceptions.ConnectionError:
         yield "server ollama belum dijalankan"
 
-    
+
 async def streame_collect(username:str,message:str):
     tokens=[]
     async for chunk in generate(message):
@@ -79,13 +82,15 @@ tools={
         "diskon_barang":diskon,
         "cek_stok_menipis":cek_stok_menipis,
 }
+
 @app.get('/d')
 async def tanya_ai(username,prompt):
     logger.info(f"username {username} mengirim prompt {prompt}")
 
     history=get_history(username)
     
-
+    context=similarity_search(prompt)
+    
     payload={
         "model":"qwen2.5:7b",
         "messages":[
@@ -93,7 +98,9 @@ async def tanya_ai(username,prompt):
                 "role":"system",
                 "content":f"""
                 
-                Konteks (jika relevan): {history}
+                History (jika relevan): {history}
+
+                Context (jika relevan): {context}
 
                 ATURAN:
                 - Pilih action paling sesuai

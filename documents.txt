@@ -1,0 +1,90 @@
+# PT Nusantara Digital Solutions
+
+PT Nusantara Digital Solutions adalah perusahaan teknologi yang berdiri pada tahun 2018 dan berfokus pada pengembangan perangkat lunak berbasis Artificial Intelligence (AI), cloud computing, dan otomatisasi proses bisnis. Kantor pusat perusahaan berada di Surabaya, Indonesia.
+Perusahaan memiliki sekitar 250 karyawan yang terbagi ke dalam beberapa divisi, yaitu Software Engineering, AI Research, DevOps, Data Engineering, Product Management, Human Resources, Marketing, dan Customer Success.
+
+## Visi
+Menjadi perusahaan teknologi AI terdepan di Asia Tenggara yang mampu membantu bisnis meningkatkan produktivitas melalui solusi berbasis kecerdasan buatan.
+
+## Misi
+* Mengembangkan produk AI yang mudah digunakan.
+* Membantu perusahaan melakukan transformasi digital.
+* Menjaga keamanan data pelanggan.
+* Terus melakukan inovasi teknologi.
+
+## Produk
+### SmartChat
+SmartChat merupakan chatbot berbasis Large Language Model yang mampu menjawab pertanyaan pelanggan secara otomatis. Produk ini mendukung integrasi dengan WhatsApp, Telegram, Discord, Slack, dan website perusahaan.
+
+### VisionInspect
+VisionInspect adalah sistem Computer Vision yang digunakan untuk mendeteksi cacat pada produk manufaktur menggunakan kamera industri.
+
+### SalesPredict
+SalesPredict memanfaatkan Machine Learning untuk memprediksi penjualan berdasarkan data historis, musim, serta tren pasar.
+
+## Teknologi yang Digunakan
+
+Bahasa Pemrograman:
+* Python
+* TypeScript
+* Go
+
+Framework:
+* FastAPI
+* LangChain
+* LangGraph
+* React
+* Next.js
+
+Database:
+* PostgreSQL
+* Redis
+* MongoDB
+
+Vector Database:
+* Chroma
+* FAISS
+* Pinecone
+
+Cloud:
+* AWS
+* Docker
+* Kubernetes
+
+## Divisi AI Research
+Divisi AI Research bertanggung jawab mengembangkan model AI, melakukan eksperimen RAG (Retrieval-Augmented Generation), membangun AI Agent, serta mengevaluasi performa model menggunakan berbagai metrik.
+
+Tim AI Research terdiri dari:
+* 1 Head of AI
+* 3 Senior AI Engineer
+* 5 AI Engineer
+* 2 Machine Learning Engineer
+* 2 Data Scientist
+
+## Alur RAG yang Digunakan
+Ketika pengguna mengajukan pertanyaan, sistem akan membaca pertanyaan tersebut lalu mengubahnya menjadi embedding menggunakan model embedding. Embedding tersebut digunakan untuk melakukan pencarian semantik pada vector database. Dokumen yang paling relevan akan dikembalikan sebagai context. Context tersebut kemudian digabungkan dengan prompt pengguna sebelum dikirim ke Large Language Model untuk menghasilkan jawaban.
+
+## Kebijakan Keamanan
+Semua data pelanggan dienkripsi menggunakan AES-256 saat disimpan. Komunikasi antara client dan server menggunakan HTTPS dengan TLS 1.3. Backup database dilakukan setiap hari pada pukul 02.00 WIB dan disimpan selama 30 hari.
+
+## Jam Operasional
+Senin–Jumat: 08.00–17.00 WIB
+Sabtu: 09.00–14.00 WIB
+Minggu dan hari libur nasional: Tutup
+
+## Kontak
+Email: [support@nusantaradigital.co.id](mailto:support@nusantaradigital.co.id)
+Telepon: (031) 555-1234
+Website: https://www.nusantaradigital.co.id
+
+## FAQ
+Q: Apakah SmartChat mendukung Bahasa Indonesia?
+A: Ya. SmartChat mendukung Bahasa Indonesia dan Bahasa Inggris.
+Q: Berapa lama implementasi produk?
+A: Implementasi rata-rata membutuhkan waktu 2 hingga 6 minggu tergantung kompleksitas proyek.
+Q: Apakah tersedia layanan konsultasi?
+A: Ya. Perusahaan menyediakan konsultasi gratis selama satu jam sebelum implementasi.
+Q: Apakah perusahaan menerima magang?
+A: Ya. Program magang dibuka setiap Januari dan Juli untuk mahasiswa dan siswa SMK jurusan teknologi informasi.
+Q: Teknologi AI apa yang paling sering digunakan?
+A: Perusahaan banyak menggunakan Retrieval-Augmented Generation (RAG), AI Agent, Computer Vision, Natural Language Processing (NLP), dan Machine Learning.
