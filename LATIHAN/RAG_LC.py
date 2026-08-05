@@ -1,11 +1,12 @@
 import requests
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_ollama import OllamaEmbeddings
+from langchain_ollama.llms import OllamaLLM
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_chroma import Chroma
 import os
 import asyncio
 import json
-AI_serv='http://localhost:11434/api/generate'
+
 embedding = OllamaEmbeddings(model="nomic-embed-text:latest")
 
 def embed_docs():
@@ -32,9 +33,11 @@ def RAG(prompt:str):
    output=retriever.invoke(prompt)
    return output[0]
 
-def tanya_ai(prompt):
-   context=RAG(prompt)
-   messages=f"""
+def tanya_ai(user_prompt):
+   context=RAG(user_prompt)
+   model=OllamaLLM(model="qwen2.5:7b")
+
+   template="""
 **ROLE**
 Kamu adalah AI assistant untuk PT Nusantara Digital Solutions. Jawab pertanyaan berdasarkan context yang diberikan.
 
@@ -53,24 +56,13 @@ Jawab pertanyaan pengguna menggunakan informasi dari context. Jika informasi tid
 {context}
 
 **USER QUESTION**
-{prompt}
+{user_prompt}
 """
-   payload={
-           "model":"qwen2.5:7b",
-           "prompt":messages,
-           "options":{
-               "temperature":0.3,
-               "num_predict":150,
-               "top_p":0.5
-           }
-       }
-   res=requests.post(AI_serv,json=payload,stream=True)
-   res.raise_for_status()
-   for line in res.iter_lines():
-      if line:
-         line=json.loads(line)
-         yield line["response"]
 
+   prompt=ChatPromptTemplate.from_template(template)
+   chain=prompt|model
+   for chunk in chain.stream({"context":context, "user_prompt":user_prompt, "options": {"temperature":0.3, "top_p":0.5}}):
+      yield chunk
 
 async def collect_stream(prompt):
    for chunk in tanya_ai(prompt):

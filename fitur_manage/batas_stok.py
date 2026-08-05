@@ -1,11 +1,18 @@
 from DB.db_setup import Barang,get_db
 import logging
 from logger_config import *
+from langchain_core.tools import tool
 
 logger = logging.getLogger(__name__)
 
-
+@tool
 def cek_stok_menipis(stok_max:int=100):
+    """Menampilkan daftar barang yang stoknya di bawah batas tertentu (stok_max).
+    Gunakan tool ini saat user ingin tahu barang mana yang stoknya menipis
+    atau perlu di-restock. Tool ini bersifat READ-ONLY — tidak melakukan
+    perubahan data apapun (bandingkan dengan tambah_stok yang mengubah data).
+    Jika user tidak menyebutkan angka batas, gunakan nilai default.
+    """
     session=get_db()
     try:
         if stok_max is not None:

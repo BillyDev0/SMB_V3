@@ -1,5 +1,6 @@
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
+from langchain_core.documents import Document
 import os
 import json
 
@@ -21,7 +22,6 @@ def embed_file():
     return Chroma.from_texts(
         embedding=embedding,
         texts=chunk,
-        persist_directory="./vector_db"
     )
 
 def similarity_search(prompt):

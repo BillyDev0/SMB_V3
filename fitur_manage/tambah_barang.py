@@ -1,10 +1,19 @@
 from DB.db_setup import get_db,Barang
 import logging
 from logger_config import *
-
+from langchain_core.tools import tool
 logger = logging.getLogger(__name__)
 
+@tool
 def tambah_barang(nama_barang, harga_barang, stok_barang):
+    
+    """Menambahkan barang BARU (yang belum pernah ada) ke database,
+    lengkap dengan nama, harga satuan, dan jumlah stok awal.
+    Gunakan tool ini hanya jika user secara eksplisit ingin membuat
+    entri barang baru — bukan untuk mengubah data barang yang sudah ada
+    (gunakan update_barang) atau menambah stok barang yang sudah ada
+    (gunakan tambah_stok).
+    """
 
     # ── Validasi input kosong / None ──────────────────────────────────────────
     if nama_barang is None or str(nama_barang).strip() == "":

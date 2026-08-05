@@ -1,10 +1,16 @@
 from DB.db_setup import get_db,Barang
 import logging
 from logger_config import *
-
+from langchain_core.tools import tool
 logger = logging.getLogger(__name__)
 
+@tool
 def hapus_barang(nama_barang):
+    """Menghapus barang yang sudah ada dari database secara permanen
+    berdasarkan nama barang. Gunakan tool ini HANYA jika user secara
+    eksplisit meminta untuk menghapus/delete barang tertentu.
+    Tindakan ini tidak bisa dibatalkan.
+    """
 
     if nama_barang is None or str(nama_barang).strip() == "":
             return {"status": "error", "pesan": "nama_barang tidak boleh kosong."}

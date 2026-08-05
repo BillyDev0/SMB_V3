@@ -1,13 +1,17 @@
 from DB.db_setup import get_db,Barang
 import logging
 from logger_config import *
-from fastapi import FastAPI
+from langchain_core.tools import tool
 logger = logging.getLogger(__name__)
 
-app=FastAPI()
-
-@app.post('/s')
+@tool
 def tambah_stok(nama_barang:str,stok_tambahan:int):
+    """Menambahkan jumlah stok pada barang yang SUDAH ADA di database,
+    tanpa mengubah harga. Gunakan tool ini khusus saat user secara eksplisit
+    ingin menambah/restock jumlah stok barang tertentu — BUKAN untuk
+    menambah barang baru (gunakan tambah_barang) atau mengubah data barang
+    secara umum seperti harga (gunakan update_barang).
+    """
     session=get_db()
     try:
         nama_barang=nama_barang.lower()
@@ -34,7 +38,13 @@ def tambah_stok(nama_barang:str,stok_tambahan:int):
     finally:
         session.close()
 
+
+@tool
 def diskon(min_stok:int=None,nama_barang:str=None,besar_diskon:int=20):
+    """Memberikan diskon (dalam persen) pada barang tertentu (isi nama_barang)
+    atau semua barang dengan stok di bawah suatu jumlah (isi min_stok).
+    Wajib isi salah satu dari nama_barang atau min_stok."""
+
     session=get_db()
     try:
         if besar_diskon <=0:

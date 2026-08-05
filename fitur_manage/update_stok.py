@@ -1,10 +1,19 @@
 from DB.db_setup import get_db, Barang
 import logging
 from logger_config import *
-
+from langchain_core.tools import tool
 logger = logging.getLogger(__name__)
 
+@tool
 def update_barang(nama_barang:str,harga_barang:float=None,stok_barang:int=None):
+    """Mengubah data barang yang SUDAH ADA di database, khususnya harga
+    dan/atau stok. Nama barang tidak bisa diubah lewat tool ini — nama
+    barang hanya dipakai untuk menentukan barang mana yang akan diupdate.
+    Gunakan tool ini untuk koreksi/perubahan data secara umum, BUKAN untuk
+    menambah stok (gunakan tambah_stok) atau memberi diskon
+    (gunakan diskon_barang).
+    Minimal salah satu dari harga_barang atau stok_barang harus diisi.
+    """
 
     if nama_barang is None or str(nama_barang).strip() == "":
         return {"status": "error", "pesan": "nama_barang tidak boleh kosong."}
